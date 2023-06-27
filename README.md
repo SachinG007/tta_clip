@@ -11,19 +11,36 @@ conda activate flyp
 pip install open_clip_torch
 pip install wilds braceexpand webdataset h5py
 pip install git+https://github.com/modestyachts/ImageNetV2_pytorch
+```
+
+### Create directories
+```bash
+cd tta_clip
 mkdir checkpoints
+mkdir -p datasets/data/
+mkdir -p datasets/csv/
 ```
 
 ### Add directory to PYTHONPATH:
 
 ```bash
-cd FLYP
+cd tta_clip
 export PYTHONPATH="$PYTHONPATH:$PWD"
 ```
 
 ### Datasets
 All the datasets we use are available publicly.
 Refer to the DATA.md for the respective dataset directory strucutre.
+
+### Script to reproduce on ImageNetSketch
+This is training on ImageNetSketch with the new captions generated from other captioning model
+```bash
+ln -s /project_data/datasets/ImageNetSketch ./datasets/data/ImageNetSketch
+ln -s /project_data/datasets/ImageNetSketch/imagenetsketch.csv ./datasets/csv/imagenetsketch.csv
+
+
+CUDA_VISIBLE_DEVICES=2,3 python src/main.py --train-dataset=ImageNetSketch --epochs=10 --lr=1e-5 --wd=0.1 --batch-size=256 --model=ViT-B/16 --eval-datasets=ImageNet,ImageNetV2,ImageNetR,ImageNetA,ImageNetSketch,ObjectNet  --template=openai_imagenet_template  --save=./checkpoints/ --data-location=./datasets/data/ --ft_data="./datasets/csv/imagenetsketch.csv" --csv-img-key filepath --csv-caption-key title --exp_name=ImageNetSketch/flyp_loss
+```
 
 ### Script to reproduce on ImageNet
 ```bash
